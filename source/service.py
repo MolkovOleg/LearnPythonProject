@@ -11,5 +11,17 @@ def main_page():
     return render_template("index.html", apt_image=apt_image, apt_address=apt_address, apt_rooms=apt_rooms,
                            apt_area=apt_area, apt_city=apt_city)
 
+@app.route("/login")
+def login_page():
+    return render_template("auth.html")
+
+@app.route("/add_new_review")
+def add_review():
+    return render_template("add_new_review.html")
+
+@app.route("/apt_review_page")
+def review_page():
+    return render_template("apt_review_page.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
