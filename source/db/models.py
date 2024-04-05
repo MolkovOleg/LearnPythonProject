@@ -1,10 +1,12 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from db import Base, engine
+from source.db.db import Base, engine
 
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -15,6 +17,11 @@ class User(Base):
     phone = Column(String)
     feedbacks = relationship('FeedbackUser')
 
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
     def __repr__(self):
         return f'User id: {self.id}, name: {self.first_name}'
 
@@ -25,6 +32,8 @@ class Apartment(Base):
     id = Column(Integer, primary_key=True)
     price = Column(Integer)
     address = Column(String)
+    city = Column(String)
+    area = Column(String)
     owner_name = Column(String)
     rooms = Column(Integer)
     photos = Column(String)
@@ -32,7 +41,7 @@ class Apartment(Base):
     feedbacks = relationship('Feedback', lazy='joined')
 
     def __repr__(self):
-        return f'Apartament id: {self.id}, name: {self.name}'
+        return f'Apartament id: {self.id}, name: {self.address}'
 
 
 class Feedback(Base):
