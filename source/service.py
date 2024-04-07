@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
-from db.models import Apartment, User
+from sqlalchemy import and_
+
+from db.models import Apartment, User, City, Area, RoomCount
 from db.db import db_session
 from config import csrf_token
 from source.forms import LoginForm, RegistrationForm
-
 
 
 app = Flask(__name__)
@@ -13,12 +14,13 @@ app.config['SECRET_KEY'] = csrf_token
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login_page'  # Note: use the function name or endpoint
+login_manager.login_view = 'login_page'
+
 
 @login_manager.user_loader
 def load_user(user_id):
-    # Assuming you have a User model with a query attribute
     return db_session.query(User).get(int(user_id))
+
 
 @app.route('/register')
 def register():
@@ -28,16 +30,17 @@ def register():
     form = RegistrationForm()
     return render_template('registration.html', forma=form, title=title)
 
+
 @app.route('/process-reg', methods=['POST'])
 def process_reg():
     forma = RegistrationForm()
     if forma.validate_on_submit():
         new_user = User(email=forma.email.data,
-                            first_name=forma.first_name.data,
-                            last_name=forma.last_name.data,
-                            password=forma.password.data,
-                            phone=forma.phone.data
-                            )
+                        first_name=forma.first_name.data,
+                        last_name=forma.last_name.data,
+                        password=forma.password.data,
+                        phone=forma.phone.data
+                        )
         new_user.set_password(forma.password.data)
         db_session.add(new_user)
         db_session.commit()
@@ -51,6 +54,7 @@ def process_reg():
                 ))
     return redirect(url_for('register'))
 
+
 @app.route("/login")
 def login_page():
     if current_user.is_authenticated:
@@ -58,6 +62,8 @@ def login_page():
     title = "Авторизация"
     form = LoginForm()
     return render_template("auth.html", form=form, title=title)
+
+
 @app.route('/login', methods=['POST'])
 def process_login():
     form = LoginForm()
@@ -70,60 +76,38 @@ def process_login():
     flash('Неправильное имя пользователя или пароль')
     return redirect(url_for('process_login'))
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('main_page'))
+
+
 @app.route("/")
 def main_page():
+    city_select = db_session.query(City).all()
+    area_select = db_session.query(Area).all()
+    room_count_select = db_session.query(RoomCount).all()
     apartments = db_session.query(Apartment).all()
-    apt_data = [
-        {"photos": apt.photos,
-         "addresses": apt.address,
-         "rooms": apt.rooms,
-         "area": apt.area,
-         "city": apt.city
-         }
-        for apt in apartments
-    ]
-    apt_rooms = list(set(apt.rooms for apt in apartments))
-    apt_areas = list(set(apt.area for apt in apartments))
-    apt_cities = list(set(apt.city for apt in apartments))
-    cities = set(apt['city'] for apt in apt_data)
-    areas = set(apt['area'] for apt in apt_data)
-    return render_template("index.html", apt_rooms=apt_rooms, cities=cities, apt_area=apt_areas,
-                           apt_city=apt_cities, apt_data=apt_data, areas=areas)
+    return render_template("index.html", apartments=apartments,
+                           city_select=city_select, area_select=area_select, room_count_select=room_count_select)
+
+
 @app.route('/filter', methods=['GET'])
 def filter_apartments():
     selected_city = request.args.get('city', '')
     selected_area = request.args.get('area', '')
+    selected_rooms = request.args.get('room', '')
 
-    apartments = db_session.query(Apartment).all()
-    apt_data = [
-        {"photos": apt.photos,
-         "addresses": apt.address,
-         "rooms": apt.rooms,
-         "area": apt.area,
-         "city": apt.city
-         }
-        for apt in apartments
-    ]
 
-    if selected_city:
-        filtered_data = [apt for apt in apt_data if apt['city'] == selected_city]
-    else:
-        filtered_data = apt_data
-
-    if selected_area:
-        filtered_data = [apt for apt in apt_data if apt['area'] == selected_area]
-    else:
-        filtered_data = apt_data
-
-    cities = set(apt['city'] for apt in apt_data)
-    areas = set(apt['area'] for apt in apt_data)
-
-    return render_template('index.html', cities=cities, areas=areas, apt_data=filtered_data)
-
+    apartments = (db_session.query(Apartment).join(Area, Apartment.area_id == Area.id).join(City, Apartment.city_id == City.id)
+                  .join(RoomCount, Apartment.rooms_id == RoomCount.id).\
+                  filter(
+                    selected_city == City.name,
+                    selected_area == Area.name,
+                    selected_rooms == RoomCount.name))
+    print(apartments.all())
+    return render_template("index.html", apartments=apartments.all())
 
 
 @app.route("/add_new_review")
@@ -133,9 +117,11 @@ def add_review():
     else:
         return redirect(url_for('main_page'))
 
+
 @app.route("/apt_review_page")
 def review_page():
     return render_template("apt_review_page.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -17,71 +17,47 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-dark bg-primary">
-      <div class="container-fluid">
-        <nav class="navbar navbar-light">
-          <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-              <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
-              Rent Review
-            </a>
-          </div>
-        </nav>
-        <div class="position-relative">
-          <div class="position-absolute top-100 end-0 translate-middle">
-            <button type="button" class="btn btn-info text-nowrap">
-              {% if current_user.is_authenticated %}
-                  <a class="nav-link" href="{{ url_for('logout') }}">Выйти</a>
-              {% else %}
-                  <a class="nav-link" href="{{ url_for('process_login') }}">Авторизация</a>
-              {% endif %}
-            </button>
-
-          </div>
-        </div>
-      </div>
-    </nav>
+    {% include 'base/navbar.html' %}
 
     <div class="position-relative">
       <div class="px-2 p-1">
         <div class="btn-group">
           <form action="/filter" method="get">
             <div class="form-floating">
-              <select class="form-select" id="citySelect" name="city" onchange="this.form.submit()">
-                  <option selected>Город</option>
-                    {% for city in cities %}
-                      <option value="{{ city }}">{{ city }}</option>
-                    {% endfor %}
+              <select class="form-select" id="citySelect" name="city">
+                <option selected disabled>Город</option>
+                  {% for city in city_select %}
+                    <option value="{{ city.name }}">{{ city.name }}</option>
+                  {% endfor %}
               </select>
               <label for="citySelect">Город</label>
             </div>
-          </form>
-          <form action="/filter" method="get">
             <div class="form-floating">
-              <select class="form-select" id="areaSelect" name="area" onchange="this.form.submit()">
-                <option selected>Район</option>
-                  {% for area in areas %}
-                    <option value="{{ area }}">{{ area }}</option>
+              <select class="form-select" id="areaSelect" name="area">
+                <option selected disabled>Район</option>
+                  {% for area in area_select %}
+                    <option value="{{ area.name }}">{{ area.name }}</option>
                   {% endfor %}
               </select>
               <label for="areaSelect">Район</label>
             </div>
+            <div class="form-floating">
+              <select class="form-select" id="roomSelect" name="room">
+                <option selected disabled>Комнаты</option>
+                  {% for room in room_count_select %}
+                    <option value="{{ room.name }}">{{ room.name }}</option>
+                  {% endfor %}
+              </select>
+              <label for="roomSelect">Комнаты</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Применить фильтр</button>
           </form>
-          <div class="form-floating">
-            <select class="form-select" id="floatingSelectRooms" aria-label="Floating label select example">
-              <option selected>Комнаты</option>
-                {% for room in apt_rooms %}
-                  <option value="{{ room }}">{{ room }}</option>
-                {% endfor %}
-            </select>
-            <label for="floatingSelectRooms">Комнаты</label>
-          </div>
         </div>
       </div>
     </div>
 
 
-    <div style="width:1450px;" align="right">
+    <div style="width:1450px" align="right">
       <a href="/add_new_review">
         <button type="button" class="btn btn-primary">+ Добавить отзыв</button>
       </a>
@@ -89,12 +65,12 @@
 
     <div class="container overflow-hidden text-center">
       <div class="row gy-1">
-        {% for apt in apt_data %}
+        {% for apt in query %}
           <div class="col-4">
             <div class="p-3">
               <img src= "{{ apt.photos }}" class="img-fluid uniform-image-size" alt="..."><br/>
               <a href="/apt_review_page">
-                {{apt.addresses}}<br/>
+                {{apt.address}}<br/>
                 Rating
               </a>
             </div>
