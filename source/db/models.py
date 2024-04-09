@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from source.db.db import Base, engine
+from db.db import Base, engine
 
 
 class User(Base, UserMixin):
@@ -41,10 +41,9 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    city_id = Column(Integer, ForeignKey("cities.id"))
-    city = relationship('City', lazy='joined')
 
     apartments = relationship('Apartment', back_populates='area')
+
 
 class RoomCount(Base):
     __tablename__ = 'room_counts'
@@ -71,7 +70,6 @@ class Apartment(Base):
     city = relationship('City', back_populates='apartments')
     area = relationship('Area', back_populates='apartments')
     rooms_count = relationship('RoomCount', back_populates='apartments')
-
 
     def __repr__(self):
         return f'Apartament id: {self.id}, name: {self.address}'
@@ -107,7 +105,6 @@ class FeedbackUser(Base):
 
     def __repr__(self):
         return f'Feedback id: {self.id}, raiting: {self.raiting}'
-
 
 
 if __name__ == '__main__':

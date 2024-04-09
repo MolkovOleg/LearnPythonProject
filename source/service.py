@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
-from sqlalchemy import and_
 
 from db.models import Apartment, User, City, Area, RoomCount
 from db.db import db_session
@@ -95,19 +94,26 @@ def main_page():
 
 @app.route('/filter', methods=['GET'])
 def filter_apartments():
+    city_select = db_session.query(City).all()
+    area_select = db_session.query(Area).all()
+    room_count_select = db_session.query(RoomCount).all()
     selected_city = request.args.get('city', '')
     selected_area = request.args.get('area', '')
     selected_rooms = request.args.get('room', '')
 
+    apartments = (db_session.query(Apartment).join(City).join(Area).join(RoomCount))
 
-    apartments = (db_session.query(Apartment).join(Area, Apartment.area_id == Area.id).join(City, Apartment.city_id == City.id)
-                  .join(RoomCount, Apartment.rooms_id == RoomCount.id).\
-                  filter(
-                    selected_city == City.name,
-                    selected_area == Area.name,
-                    selected_rooms == RoomCount.name))
-    print(apartments.all())
-    return render_template("index.html", apartments=apartments.all())
+    if selected_city:
+        apartments = apartments.filter(City.name == selected_city)
+
+    if selected_area:
+        apartments = apartments.filter(Area.name == selected_area)
+
+    if selected_rooms:
+        apartments = apartments.filter(RoomCount.name == selected_rooms)
+
+    return render_template("index.html", apartments=apartments.all(),
+                           city_select=city_select, area_select=area_select, room_count_select=room_count_select)
 
 
 @app.route("/add_new_review")
@@ -125,4 +131,3 @@ def review_page():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
