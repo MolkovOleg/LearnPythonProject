@@ -10,18 +10,7 @@
   </head>
 
 <body>
-    <nav class="navbar navbar-dark bg-primary">
-      <div class="container-fluid">
-        <nav class="navbar navbar-light">
-          <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-              <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
-              Rent Review
-            </a>
-          </div>
-        </nav>
-      </div>
-    </nav>
+    {% include 'base/navbar.html' %}
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -50,9 +39,10 @@
               {{ form.password(class="form-control", id="inputPassword", type="password", placeholder="Password") }}
             </p>
           </div>
-          <p class="checkbox">
-            <label><input type="checkbox">Remember Me</label>
-          </p>
+          <div class="form-group form-check">
+              {{ form.remember_me(class_="form-check-label") }}
+              {{ form.remember_me.label }}
+          </div>
             {{ form.submit }}
           <a href="/register">
             <button type="button" class="btn btn-lg btn-primary btn-block">
