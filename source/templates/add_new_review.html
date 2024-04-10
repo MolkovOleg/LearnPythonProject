@@ -10,5 +10,50 @@
   </head>
 <body>
     {% include 'base/navbar.html' %}
+
+    <div class="container-fluid h-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('create_feedback') }}" method='post'>
+                <div class="form-group">
+                    <h1>{{ title }}</h1>
+                      <div class="col-md">
+                        <div class="form-floating">
+                          <select class="form-select" id="aptSelect" name="apt">
+                            <option selected disabled>Город</option>
+                              {% for apt in apartments %}
+                                <option value="{{ apt.address }}">{{ apt.address }}</option>
+                              {% endfor %}
+                              {% set city_n = apt %}
+                          </select>
+                          <label for="aptSelect">Адрес</label>
+                        </div>
+                      </div>
+
+                    <p>
+                        {{ form.apartment_id.label }}
+                        {{ form.apartment_id() }}
+                    </p>
+                    <p>
+                        {{ form.raiting.label }}
+                        {{ form.raiting() }}
+                    </p>
+                    <p>
+                        {{ form.price.label }}
+                        {{ form.price() }}
+                    </p>
+                    <p>
+                        {{ form.owner_name.label }}
+                        {{ form.owner_name() }}
+                    </p>
+                    <p>
+                        {{ form.text.label }}
+                        {{ form.text() }}
+                    </p>
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>
