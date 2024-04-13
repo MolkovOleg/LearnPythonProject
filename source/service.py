@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
 
-from db.models import Apartment, User, City, Area, RoomCount
+from db.models import Apartment, User, City, Area, RoomCount, Feedback
 from db.db import db_session
 from config import csrf_token
-from source.forms import LoginForm, RegistrationForm
+from source.forms import LoginForm, RegistrationForm, FeedbackForm
 
 
 app = Flask(__name__)
@@ -116,10 +116,33 @@ def filter_apartments():
                            city_select=city_select, area_select=area_select, room_count_select=room_count_select)
 
 
-@app.route("/add_new_review")
-def add_review():
+@app.route("/add_new_review", methods=['GET', 'POST'])
+def add_new_review():
+    title = 'Оставьте отзыв'
+    apartments = db_session.query(Apartment)
+    form = FeedbackForm()
     if current_user.is_authenticated:
-        return render_template("add_new_review.html")
+        return render_template("add_new_review.html", form=form, title=title, apartments=apartments)
+    else:
+        return redirect(url_for('main_page'))
+
+
+@app.route("/create_feedback", methods=['POST'])
+def create_feedback():
+    selected_apt = request.form.get('apt')
+    selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt).first()
+    form = FeedbackForm()
+    if current_user.is_authenticated:
+        new_feedback = Feedback(apartment_id=selected_apt_id.id,
+                                raiting=form.raiting.data,
+                                price=form.price.data,
+                                owner_name=form.owner_name.data,
+                                text=form.text.data,
+                                photo=form.photo.data
+                                )
+        db_session.add(new_feedback)
+        db_session.commit()
+        return redirect(url_for('main_page'))
     else:
         return redirect(url_for('main_page'))
 

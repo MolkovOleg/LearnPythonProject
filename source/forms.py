@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, MultipleFileField, IntegerField
 from wtforms.validators import (DataRequired, Email, EqualTo,
-                                Length, ValidationError)
+                                Length, ValidationError, InputRequired)
 from db.models import User
 
 
@@ -52,3 +52,17 @@ class RegistrationForm(FlaskForm):
             raise ValidationError(
                 'Пользователь с таким телефоном уже зарегистрирован'
             )
+
+
+class FeedbackForm(FlaskForm):
+    apartment_id = IntegerField('Введите id квартира')
+    raiting = IntegerField('Rating')
+    price = IntegerField('Price')
+    owner_name = TextAreaField('Введите имя')
+    text = TextAreaField('Введите отзыв')
+    photo = MultipleFileField('Загрузите фото')
+    submit = SubmitField('Оставить отзыв',
+                         render_kw={"class":
+                                    "btn btn-lg btn-primary "
+                                    "btn-block btn-outline-*"})
+
