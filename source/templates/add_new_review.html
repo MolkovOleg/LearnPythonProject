@@ -19,11 +19,9 @@
                       <div class="col-md">
                         <div class="form-floating">
                           <select class="form-select" id="aptSelect" name="apt">
-                            <option selected disabled>Город</option>
                               {% for apt in apartments %}
                                 <option value="{{ apt.address }}">{{ apt.address }}</option>
                               {% endfor %}
-                              {% set city_n = apt %}
                           </select>
                           <label for="aptSelect">Адрес</label>
                         </div>
@@ -51,6 +49,7 @@
                     </p>
                     {{ form.submit }}
                 </div>
+
             </form>
         </div>
     </div>

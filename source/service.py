@@ -129,13 +129,11 @@ def add_new_review():
 
 @app.route("/create_feedback", methods=['POST'])
 def create_feedback():
-    selected_apt = request.args.get('', '')
-    print(f'dfsd{selected_apt}')
-    selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt)
-    print(selected_apt_id.all())
+    selected_apt = request.form.get('apt')
+    selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt).first()
     form = FeedbackForm()
     if current_user.is_authenticated:
-        new_feedback = Feedback(apartment_id=selected_apt_id,
+        new_feedback = Feedback(apartment_id=selected_apt_id.id,
                                 raiting=form.raiting.data,
                                 price=form.price.data,
                                 owner_name=form.owner_name.data,
