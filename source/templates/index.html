@@ -1,77 +1,81 @@
-<!DOCTYPE html>
-<html lang="ru">
-  {% extends "base.html" %}
-
+{% extends "base.html" %}
   <body>
-
     {% block content %}
-    <form action="/filter" method="get">
-        <div class="w-50 p-3">
-          <div class="row">
-            <div class="col-md">
-              <div class="form-floating">
-                <select class="form-select" id="citySelect" name="city">
-                  <option selected disabled>Город</option>
-                    {% for city in city_select %}
-                      <option value="{{ city.name }}">{{ city.name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="citySelect">Город</label>
-              </div>
+
+    <form action="/filter" method="GET">
+      <div class="w-50 p-3">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+          {% endwith %}
+        <div class="row">
+          <div class="col-md">
+            <div class="form-floating">
+              <select class="form-select" id="citySelect" name="city" aria-label="Select City">
+                <option selected disabled>Город</option>
+                {% for city in city_select | sort(attribute="name") %}
+                  <option value="{{ city.name }}">{{ city.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="citySelect">Город</label>
             </div>
-            <div class="col-md">
-              <div class="form-floating">
-                <select class="form-select" id="areaSelect" name="area">
-                  <option selected disabled>Район</option>
-                    {% for area in area_select %}
-                      <option value="{{ area.name }}">{{ area.name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="areaSelect">Район</label>
-              </div>
+          </div>
+          <div class="col-md">
+            <div class="form-floating">
+              <select class="form-select" id="areaSelect" name="area" aria-label="Select Area">
+                <option selected disabled>Район</option>
+                {% for area in area_select | sort(attribute="name") %}
+                  <option value="{{ area.name }}">{{ area.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="areaSelect">Район</label>
             </div>
-            <div class="col-md">
-              <div class="form-floating">
-                <select class="form-select" id="roomSelect" name="room">
-                  <option selected disabled>Комнаты</option>
-                    {% for room in room_count_select %}
-                      <option value="{{ room.name }}">{{ room.name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="roomSelect">Комнаты</label>
-              </div>
+          </div>
+          <div class="col-md">
+            <div class="form-floating">
+              <select class="form-select" id="roomSelect" name="room" aria-label="Select Number of Rooms">
+                <option selected disabled>Комнаты</option>
+                {% for room in room_count_select | sort(attribute="name") %}
+                  <option value="{{ room.name }}">{{ room.name }}</option>
+                {% endfor %}
+              </select>
+              <label for="roomSelect">Комнаты</label>
             </div>
-            <div class="col-md">
-              <div class="mt-2">
-                <button type="submit" class="btn btn-primary">Применить</button>
-              </div>
+          </div>
+          <div class="col-md">
+            <div class="mt-2">
+              <button type="submit" class="btn btn-primary">Применить</button>
             </div>
           </div>
         </div>
+      </div>
     </form>
 
-
-      <div style="width:1450px" align="right">
-        <a href="/add_new_review">
-          <button type="button" class="btn btn-primary">+ Добавить отзыв</button>
-        </a>
-      </div>
-
-      <div class="container overflow-hidden text-center">
-        <div class="row gy-1">
-          {% for apt in apartments %}
-            <div class="col-4">
-              <div class="p-3">
-                <img src= "{{ apt.photos }}" class="img-fluid uniform-image-size" alt="..."><br/>
-                <a href="/apt_review_page">
-                  {{apt.address}}<br/>
-                  Rating
-                </a>
-              </div>
+    <div style="width:1450px" align="right">
+      <a href="/add_new_review">
+        <button type="button" class="btn btn-primary">+ Добавить отзыв</button>
+      </a>
+    </div>
+    <div class="container overflow-hidden text-center">
+      <div class="row gy-1">
+        {% for apt in apartments %}
+          <div class="col-4">
+            <div class="p-3">
+              <a href="/apt_review_page">
+                <img src= "{{ apt.photos }}" class="img-fluid uniform-image-size" alt="...">
+              </a>
+              {{ apt.address }}</br>
+              Rating
             </div>
+          </div>
           {% endfor %}
-        </div>
+          {% endblock %}
       </div>
-    {% endblock %}
+    </div>
   </body>
 </html>

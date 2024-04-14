@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from db.db import Base, engine
+from source.db.db import Base, engine
 
 
 class User(Base, UserMixin):
@@ -15,6 +15,7 @@ class User(Base, UserMixin):
     email = Column(String)
     password = Column(String)
     phone = Column(String)
+
     feedbacks = relationship('FeedbackUser')
 
     def set_password(self, password):
@@ -41,7 +42,9 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
+    city_id = Column(Integer, ForeignKey("cities.id"))
 
+    city = relationship('City', lazy='joined')
     apartments = relationship('Apartment', back_populates='area')
 
 
@@ -66,6 +69,7 @@ class Apartment(Base):
     rooms_id = Column(Integer, ForeignKey('room_counts.id'))
     photos = Column(String)
     website = Column(String)
+
     feedbacks = relationship('Feedback', lazy='joined')
     city = relationship('City', back_populates='apartments')
     area = relationship('Area', back_populates='apartments')
@@ -79,13 +83,13 @@ class Feedback(Base):
     __tablename__ = 'feedbacks'
 
     id = Column(Integer, primary_key=True)
-    apartment_id = Column(Integer, ForeignKey(Apartment.id),
-                          index=True, nullable=False)
+    apartment_id = Column(Integer, ForeignKey(Apartment.id), index=True, nullable=False)
     raiting = Column(Integer)
     price = Column(Integer)
     owner_name = Column(String)
     text = Column(String)
     photo = Column(String)
+
     apartments = relationship('Apartment', lazy='joined')
     feedbacks = relationship('FeedbackUser')
 
@@ -100,6 +104,7 @@ class FeedbackUser(Base):
     user_id = Column(Integer, ForeignKey(User.id), index=True, nullable=False)
     feedback_id = Column(Integer, ForeignKey(Feedback.id), index=True, nullable=False)
     publication_date = Column(Date)
+
     users = relationship('User', lazy='joined')
     feedbacks = relationship('Feedback', lazy='joined')
 
