@@ -9,7 +9,7 @@
     {% with messages = get_flashed_messages() %}
       {% if messages %}
           {% for message in messages %}
-          <div class="alert alert-danger" role="alert">
+          <div class="alert alert-warning" role="alert">
               {{ message }}
           </div>
           {% endfor %}
@@ -33,9 +33,11 @@
               {{ form.password(class="form-control", id="inputPassword", type="password", placeholder="Password") }}
             </p>
           </div>
-          <div class="form-group form-check">
+          <div class="form-group">
+            <p>
               {{ form.remember_me(class_="form-check-label") }}
               {{ form.remember_me.label }}
+            </p>
           </div>
             {{ form.submit }}
           <a href="/register">

@@ -1,63 +1,49 @@
-<!DOCTYPE html>
-<html lang="ru">
-  {% extends "base.html" %}
+{% extends "base.html" %}
 
-  <body>
+<body>
 
-    {% block content %}
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-danger" role="alert">
-              {{ message }}
-          </div>
-          {% endfor %}
-      {% endif %}
-    {% endwith %}
-
+  {% block content %}
     <div class="container-fluid h-100">
       <div class="row h-100 justify-content-center align-items-center">
-        <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('process_reg') }}" method='post'>
+        <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('process_reg') }}" method='POST'>
           <h1>{{ title }}</h1>
-          {{ forma.hidden_tag() }}
+          {{ form.hidden_tag() }}
           <div class="form-group">
             <p>
-              <label id="inputEmail">{{ forma.email.label }}</label>
-              {{ forma.email(class="form-control", id="inputEmail", type="email", placeholder="Введите актуальный адрес электронной почты") }}
+              <label id="inputEmail">{{ form.email.label }}</label>
+              {{ form.email(class="form-control", id="inputEmail", type="email", placeholder="Введите актуальный адрес электронной почты") }}
             </p>
           </div>
           <div class="form-group">
             <p>
-              <label id="inputFirstName">{{ forma.first_name.label }}</label>
-              {{ forma.first_name(class="form-control", id="inputFirstName", type="first_name", placeholder="Введите ваше имя") }}
+              <label id="inputFirstName">{{ form.first_name.label }}</label>
+              {{ form.first_name(class="form-control", id="inputFirstName", type="first_name", placeholder="Введите ваше имя") }}
             </p>
           </div>
           <div class="form-group">
             <p>
-              <label id="inputLastName">{{ forma.last_name.label }}</label>
-              {{ forma.last_name(class="form-control", id="inputLastName", type="last_name", placeholder="Введите вашу фамилию") }}
+              <label id="inputLastName">{{ form.last_name.label }}</label>
+              {{ form.last_name(class="form-control", id="inputLastName", type="last_name", placeholder="Введите вашу фамилию") }}
             </p>
           </div>
           <div class="form-group">
             <p>
-              <label id="inputPhone">{{ forma.phone.label }}</label>
-              {{ forma.phone(class="form-control", id="inputPhone", type="last_name", placeholder="Введите номер телефона") }}
+              <label id="inputPhone">{{ form.phone.label }}</label>
+              {{ form.phone(class="form-control", id="inputPhone", type="last_name", placeholder="Введите номер телефона") }}
             </p>
           </div>
           <div class="form-group">
             <p>
-              <label id="inputPassword">{{ forma.password.label }}</label>
-              {{ forma.password(class="form-control", id="inputPassword", type="password", placeholder="Введите пароль") }}
+              <label id="inputPassword">{{ form.password1.label }}</label>
+              {{ form.password1(class="form-control", id="inputPassword", type="password", placeholder="Введите пароль") }}
             </p>
-          </div>
           <div class="form-group">
             <p>
-              <label id="inputPassword2">{{ forma.password2.label }}</label>
-              {{ forma.password2(class="form-control", placeholder="Подтвердите пароль") }}
+              <label id="inputPassword2">{{ form.password2.label }}</label>
+              {{ form.password2(class="form-control", placeholder="Подтвердите пароль") }}
             </p>
           </div>
-            {{ forma.submit }}
+            {{ form.submit }}
           <a href="/login">
             <button type="button" class="btn btn-lg btn-primary btn-block btn-outline-*">
               Войти
