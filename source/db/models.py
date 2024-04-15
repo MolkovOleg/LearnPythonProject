@@ -42,9 +42,7 @@ class Area(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    city_id = Column(Integer, ForeignKey("cities.id"))
 
-    city = relationship('City', lazy='joined')
     apartments = relationship('Apartment', back_populates='area')
 
 
