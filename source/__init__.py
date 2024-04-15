@@ -131,14 +131,15 @@ def create_app():
     def create_feedback():
         selected_apt = request.form.get('apt')
         selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt).first()
+        user_id = current_user.get_id()
         form = FeedbackForm()
         if current_user.is_authenticated:
             new_feedback = Feedback(apartment_id=selected_apt_id.id,
                                     raiting=form.raiting.data,
                                     price=form.price.data,
-                                    owner_name=form.owner_name.data,
+                                    owner_name=selected_apt_id.owner_name,
                                     text=form.text.data,
-                                    photo=form.photo.data
+                                    photo=form.photo.data,
                                     )
             db_session.add(new_feedback)
             db_session.commit()
