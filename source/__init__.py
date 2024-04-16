@@ -144,16 +144,16 @@ def create_app():
                                     )
             db_session.add(new_feedback)
             db_session.commit()
-            print(f'sdfs{new_feedback.id}')
             new_feedback_id = FeedbackUser(user_id=current_user.get_id(),
-                                    feedback_id=new_feedback.id,
-                                    publication_date=datetime.datetime.now()
-                                    )
+                                           feedback_id=new_feedback.id,
+                                           publication_date=datetime.datetime.now()
+                                           )
             db_session.add(new_feedback_id)
             db_session.commit()
             return redirect(url_for('main_page'))
         else:
             return redirect(url_for('main_page'))
+
     @app.route("/apt_review_page", methods=['GET'])
     def review_page():
         apartments = db_session.query(Apartment).all()
