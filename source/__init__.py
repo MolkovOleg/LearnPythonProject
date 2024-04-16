@@ -1,7 +1,9 @@
+import datetime
+
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
 
-from source.db.models import Apartment, Area, City, Feedback, RoomCount, User
+from source.db.models import Apartment, Area, City, Feedback, RoomCount, User, FeedbackUser
 from source.db.db import db_session
 from source.forms import LoginForm, RegistrationForm, FeedbackForm
 
@@ -131,7 +133,6 @@ def create_app():
     def create_feedback():
         selected_apt = request.form.get('apt')
         selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt).first()
-        user_id = current_user.get_id()
         form = FeedbackForm()
         if current_user.is_authenticated:
             new_feedback = Feedback(apartment_id=selected_apt_id.id,
@@ -143,10 +144,16 @@ def create_app():
                                     )
             db_session.add(new_feedback)
             db_session.commit()
+            print(f'sdfs{new_feedback.id}')
+            new_feedback_id = FeedbackUser(user_id=current_user.get_id(),
+                                    feedback_id=new_feedback.id,
+                                    publication_date=datetime.datetime.now()
+                                    )
+            db_session.add(new_feedback_id)
+            db_session.commit()
             return redirect(url_for('main_page'))
         else:
             return redirect(url_for('main_page'))
-
     @app.route("/apt_review_page", methods=['GET'])
     def review_page():
         apartments = db_session.query(Apartment).all()
