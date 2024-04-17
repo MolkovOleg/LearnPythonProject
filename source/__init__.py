@@ -52,7 +52,7 @@ def create_app():
             apartments = apartments.filter(Area.name == selected_area)
 
         if selected_rooms:
-            apartments = apartments.filter(RoomCount.rooms == selected_rooms)
+            apartments = apartments.filter(RoomCount.name == selected_rooms)
 
         return render_template("index.html",
                                apartments=apartments.all(),
