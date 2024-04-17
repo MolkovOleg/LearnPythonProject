@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, IntegerField, MultipleFileField
-from wtforms.validators import DataRequired, Email, EqualTo, InputRequired, Length, ValidationError
+from wtforms import (BooleanField, PasswordField, StringField, SubmitField, TextAreaField,
+                     IntegerField, MultipleFileField)
+from wtforms.validators import DataRequired, Email, EqualTo, NumberRange, Length, ValidationError
 from source.db.models import User
 
 
@@ -31,10 +32,10 @@ class RegistrationForm(FlaskForm):
 
 
 class FeedbackForm(FlaskForm):
-    apartment_id = IntegerField('Введите id квартира')
-    raiting = IntegerField('Rating')
-    price = IntegerField('Price')
-    owner_name = TextAreaField('Введите имя')
-    text = TextAreaField('Введите отзыв')
-    photo = MultipleFileField('Загрузите фото')
+    apartment_id = IntegerField('Введите id квартира',validators=[DataRequired()], render_kw={"class": "form-control"})
+    raiting = IntegerField('Rating', validators=[DataRequired(), NumberRange(min=0,max=10)], render_kw={"class": "form-control"})
+    price = IntegerField('Price', validators=[DataRequired()], render_kw={"class": "form-control"})
+    text = TextAreaField('Введите отзыв', validators=[DataRequired()], render_kw={"class": "form-control"})
+    photo = MultipleFileField('Загрузите фото', render_kw={"class": "form-control-file"})
+    user_id = IntegerField(validators=[DataRequired()])
     submit = SubmitField('Оставить отзыв', render_kw={"class": "btn btn-lg btn-primary btn-block btn-outline-*"})

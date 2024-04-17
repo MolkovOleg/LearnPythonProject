@@ -1,7 +1,9 @@
+import datetime
+
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
 
-from source.db.models import Apartment, Area, City, Feedback, RoomCount, User
+from source.db.models import Apartment, Area, City, Feedback, RoomCount, User, FeedbackUser
 from source.db.db import db_session
 from source.forms import LoginForm, RegistrationForm, FeedbackForm
 
@@ -50,7 +52,7 @@ def create_app():
             apartments = apartments.filter(Area.name == selected_area)
 
         if selected_rooms:
-            apartments = apartments.filter(RoomCount.rooms == selected_rooms)
+            apartments = apartments.filter(RoomCount.name == selected_rooms)
 
         return render_template("index.html",
                                apartments=apartments.all(),
@@ -136,11 +138,17 @@ def create_app():
             new_feedback = Feedback(apartment_id=selected_apt_id.id,
                                     raiting=form.raiting.data,
                                     price=form.price.data,
-                                    owner_name=form.owner_name.data,
+                                    owner_name=selected_apt_id.owner_name,
                                     text=form.text.data,
-                                    photo=form.photo.data
+                                    photo=form.photo.data,
                                     )
             db_session.add(new_feedback)
+            db_session.commit()
+            new_feedback_id = FeedbackUser(user_id=current_user.get_id(),
+                                           feedback_id=new_feedback.id,
+                                           publication_date=datetime.datetime.now()
+                                           )
+            db_session.add(new_feedback_id)
             db_session.commit()
             return redirect(url_for('main_page'))
         else:

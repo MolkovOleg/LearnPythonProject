@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </head>
 <body>
-    {% include 'base/navbar.html' %}
+    {% include 'base.html' %}
 
     <div class="container-fluid h-100">
         <div class="row h-100 justify-content-center align-items-center">
@@ -26,11 +26,6 @@
                           <label for="aptSelect">Адрес</label>
                         </div>
                       </div>
-
-                    <p>
-                        {{ form.apartment_id.label }}
-                        {{ form.apartment_id() }}
-                    </p>
                     <p>
                         {{ form.raiting.label }}
                         {{ form.raiting() }}
@@ -40,19 +35,24 @@
                         {{ form.price() }}
                     </p>
                     <p>
-                        {{ form.owner_name.label }}
-                        {{ form.owner_name() }}
-                    </p>
-                    <p>
                         {{ form.text.label }}
                         {{ form.text() }}
                     </p>
+                    <p>
+                        <form>
+                          <div class="form-group">
+                            <label>Прикрепите фото</label>
+                              <p>
+                                  {{ form.photo() }}
+                              </p>
+
+                          </div>
+                        </form>
+                    </p>
                     {{ form.submit }}
                 </div>
-
             </form>
         </div>
     </div>
-
 </body>
 </html>
