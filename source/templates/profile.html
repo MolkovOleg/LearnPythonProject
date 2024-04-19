@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+  {% extends "base.html" %}
+
+  <body>
+
+    {% block content %}
+      <div class="container overflow-hidden text-center">
+        <div class="row gy-1">
+          {% for i in user_feedback %}
+              <div class="col-4">
+                <div class="p-3">
+                  <img src= "{{ i.apartments.photos }}" class="img-fluid uniform-image-size" alt="..."><br/>
+                  <a href="/apt_review_page">
+                    {{ i.text }}<br/>
+                    {{ i.owner_name }}<br/>
+                    {{ i.raiting }}
+                  </a>
+                </div>
+              </div>
+          {% endfor %}
+          <div style="width:1450px" align="right">
+            <a href="/profile">
+              <button type="button" class="btn btn-primary">Профиль</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endblock %}
+  </body>
+</html>

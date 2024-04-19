@@ -159,4 +159,17 @@ def create_app():
         apartments = db_session.query(Apartment).all()
         return render_template("apt_review_page.html", apartments=apartments)
 
+    @app.route("/profile")
+    def profile():
+        if current_user.is_authenticated:
+            user_feedback = ((db_session.query(Feedback)
+                             .join(FeedbackUser, Feedback.id == FeedbackUser.feedback_id)
+                             .join(Apartment, Apartment.id == Feedback.apartment_id)
+                             .filter(FeedbackUser.feedback_id == Feedback.id))
+                             .all())
+
+            for apt in user_feedback:
+                print(apt.apartments.photos)
+            return render_template("profile.html", user_feedback=user_feedback)
+
     return app
