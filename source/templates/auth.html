@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
+
 {% extends "base.html" %}
 
   <body>
@@ -9,8 +8,9 @@
     {% with messages = get_flashed_messages() %}
       {% if messages %}
           {% for message in messages %}
-          <div class="alert alert-warning" role="alert">
-              {{ message }}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
           {% endfor %}
       {% endif %}
@@ -41,7 +41,7 @@
           </div>
             {{ form.submit }}
           <a href="/register">
-            <button type="button" class="btn btn-lg btn-primary btn-block">
+            <button type="button" class="btn" style="background-color: #ADD8E6;">
               Регистрация
             </button>
           </a>
@@ -50,4 +50,3 @@
     </div>
   {% endblock %}
 </body>
-</html>
