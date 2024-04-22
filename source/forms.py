@@ -8,7 +8,7 @@ from source.db.models import User
 class LoginForm(FlaskForm):
     email = StringField('Имя пользователя', validators=[DataRequired()], render_kw={"class": "form-control"})
     password = PasswordField('Пароль', validators=[DataRequired()], render_kw={"class": "form-control"})
-    submit = SubmitField('Войти', render_kw={"class": "btn btn-lg btn-primary btn-block-*"})
+    submit = SubmitField('Войти', render_kw={"class":"btn", "style":"background-color: #ADD8E6;"})
     remember_me = BooleanField('Запомнить меня', default=True, render_kw={"class": "form-check-input"})
 
 class RegistrationForm(FlaskForm):
@@ -18,7 +18,7 @@ class RegistrationForm(FlaskForm):
     phone = StringField('Телефон', validators=[DataRequired(), Length(min=11)], render_kw={"class": "form-control"})
     password1 = PasswordField('Пароль', validators=[DataRequired()], render_kw={"class": "form-control"})
     password2 = PasswordField('Повторите пароль', validators=[DataRequired(), EqualTo('password1')], render_kw={"class": "form-control"})
-    submit = SubmitField('Зарегистрироваться', render_kw={"class": "btn btn-lg btn-primary btn-block btn-outline-*"})
+    submit = SubmitField('Зарегистрироваться', render_kw={"class":"btn", "style":"background-color: #ADD8E6;"})
 
     def validate_email(self, email):
         users_count = User.query.filter_by(email=email.data).count()

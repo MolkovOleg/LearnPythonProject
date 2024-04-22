@@ -107,7 +107,7 @@ class FeedbackUser(Base):
     feedbacks = relationship('Feedback', lazy='joined')
 
     def __repr__(self):
-        return f'Feedback id: {self.id}, raiting: {self.raiting}'
+        return f'Feedback id: {self.id}'
 
 
 if __name__ == '__main__':

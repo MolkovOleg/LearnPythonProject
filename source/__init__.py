@@ -127,7 +127,8 @@ def create_app():
         if current_user.is_authenticated:
             return render_template("add_new_review.html", form=form, title=title, apartments=apartments)
         else:
-            return redirect(url_for('main_page'))
+            flash('Вы неавторизованы')
+            return redirect(url_for('login_page'))
 
     @app.route("/create_feedback", methods=['POST'])
     def create_feedback():
@@ -152,11 +153,30 @@ def create_app():
             db_session.commit()
             return redirect(url_for('main_page'))
         else:
-            return redirect(url_for('main_page'))
+            flash('Вы неавторизованы')
+            return redirect(url_for('login_page'))
 
     @app.route("/apt_review_page", methods=['GET'])
     def review_page():
         apartments = db_session.query(Apartment).all()
         return render_template("apt_review_page.html", apartments=apartments)
+
+    @app.route("/profile")
+    def profile():
+        title = "Профиль"
+        personal_info = "Личная информация"
+        reviews = "Ваши отзывы"
+        user_info = db_session.query(User).filter(User.id == current_user.get_id())
+        if current_user.is_authenticated:
+            user_feedback = ((db_session.query(Feedback)
+                             .join(FeedbackUser, Feedback.id == FeedbackUser.feedback_id)
+                             .join(Apartment, Apartment.id == Feedback.apartment_id)
+                             .filter(FeedbackUser.feedback_id == Feedback.id))
+                             .all())
+            return render_template("profile.html", user_feedback=user_feedback, title=title,
+                                   reviews=reviews, user_info=user_info, personal_info=personal_info)
+        else:
+            flash('Вы неавторизованы')
+            return redirect(url_for('login_page'))
 
     return app

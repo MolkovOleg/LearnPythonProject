@@ -1,10 +1,19 @@
-<!DOCTYPE html>
-<html lang="ru">
-  {% extends "base.html" %}
+{% extends "base.html" %}
 
   <body>
 
     {% block content %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <form action="/filter" method="get">
         <div class="w-50 p-3">
           <div class="row">
@@ -43,7 +52,7 @@
             </div>
             <div class="col-md">
               <div class="mt-2">
-                <button type="submit" class="btn btn-primary">Применить</button>
+                <button type="submit" class="btn" style="background-color: #ADD8E6;">Применить</button>
               </div>
             </div>
           </div>
@@ -53,7 +62,7 @@
 
       <div style="width:1450px" align="right">
         <a href="/add_new_review">
-          <button type="button" class="btn btn-primary">+ Добавить отзыв</button>
+          <button type="button" class="btn" style="background-color: #ADD8E6;">+ Добавить отзыв</button>
         </a>
       </div>
 
@@ -74,4 +83,3 @@
       </div>
     {% endblock %}
   </body>
-</html>
