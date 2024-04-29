@@ -1,0 +1,84 @@
+
+  {% extends "base.html" %}
+
+<body>
+    {% block content %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="container-fluid h-100">
+        <div class="row h-100 justify-content-center align-items-center">
+            <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('create_apt') }}" method='post' >
+                <div class="form-group">
+                    <h1>{{ title }}</h1>
+                    <p>
+                        {{ form.owner_name.label }}
+                        {{ form.owner_name() }}
+                    </p>
+                    <p>
+                        <div class="form-floating">
+                          <select class="form-select" id="citySelect" name="city">
+                              <option value="" selected disabled>Выберите город</option>
+                              {% for city in city_select %}
+                                <option value="{{ city.name }}">{{ city.name }}</option>
+                              {% endfor %}
+                          </select>
+                          <label for="citySelect">Город</label>
+                        </div>
+                    </p>
+                    <p>
+                        <div class="form-floating">
+                          <select class="form-select" id="areaSelect" name="area">
+                              <option value="" selected disabled>Выберите район</option>
+                              {% for area in area_select %}
+                                <option value="{{ area.name }}">{{ area.name }}</option>
+                              {% endfor %}
+                          </select>
+                          <label for="areaSelect">Район</label>
+                        </div>
+                    </p>
+                    <p>
+                        {{ form.address.label }}
+                        {{ form.address() }}
+                        {{ form.bld.label }}
+                        {{ form.bld() }}
+                        {{ form.apt.label }}
+                        {{ form.apt() }}
+                    </p>
+                    <p>
+                        <div class="form-floating">
+                          <select class="form-select" id="roomSelect" name="room">
+                              <option value="" selected disabled>Выберите количество комнат</option>
+                              {% for room in room_count_select %}
+                                <option value="{{ room.name }}">{{ room.name }}</option>
+                              {% endfor %}
+                          </select>
+                          <label for="roomSelect">Комнаты</label>
+                        </div>
+                    </p>
+                    <p>
+                        {{ form.price.label }}
+                        {{ form.price() }}
+                    </p>
+                    <p>
+                        {{ form.url.label }}
+                        {{ form.url() }}
+                    </p>
+                    <p>
+                        <label>Прикрепите фото</label>
+                        {{ form.photo() }}
+                    </p>
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endblock %}
+</body>
