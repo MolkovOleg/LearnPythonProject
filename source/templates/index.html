@@ -71,10 +71,9 @@
           {% for apt in apartments %}
             <div class="col-4">
               <div class="p-3">
-                <img src= "{{ apt.photos }}" class="img-fluid uniform-image-size" alt="..."><br/>
+                <img src= "{{ url_for('static', filename=apt.photos)}}" class="img-fluid uniform-image-size" alt="..."><br/>
                 <a href="/apt_review_page">
                   {{apt.address}}<br/>
-                  Rating
                 </a>
               </div>
             </div>

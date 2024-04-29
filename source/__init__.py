@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 
 from source.db.models import Apartment, Area, City, Feedback, RoomCount, User, FeedbackUser
 from source.db.db import db_session
-from source.forms import LoginForm, RegistrationForm, FeedbackForm
+from source.forms import LoginForm, RegistrationForm, FeedbackForm, ApartmentForm
 
 
 def create_app():
@@ -27,12 +27,25 @@ def create_app():
         area_select = db_session.query(Area).all()
         room_count_select = db_session.query(RoomCount).all()
         apartments = db_session.query(Apartment).all()
+        # feedbacks = db_session.query(Feedback).all()
+        #
+        # names = dict()
+        #
+        # for feedback in feedbacks:
+        #     if feedback['apartment_id'] not in names.keys():
+        #         names[feedback['apartment_id']] = 1
+        #     else:
+        #         names[feedback['apartment_id']] += 1
+        #
+        # for name, count in names.items():
+        #     print(f'{name}: {count}')
 
         return render_template("index.html",
                                apartments=apartments,
                                city_select=city_select,
                                area_select=area_select,
-                               room_count_select=room_count_select)
+                               room_count_select=room_count_select
+                               )
 
     @app.route('/filter', methods=['GET'])
     def filter_apartments():
@@ -109,9 +122,9 @@ def create_app():
 
                 flash('Вы вошли на сайт')
                 return redirect(url_for('main_page'))
-
-        flash('Неправильное имя пользователя или пароль')
-        return redirect(url_for('login'))
+            else:
+                flash('Неправильное имя пользователя или пароль')
+                return redirect(url_for('login_page'))
 
     @app.route('/logout')
     def logout():
@@ -175,6 +188,54 @@ def create_app():
                              .all())
             return render_template("profile.html", user_feedback=user_feedback, title=title,
                                    reviews=reviews, user_info=user_info, personal_info=personal_info)
+        else:
+            flash('Вы неавторизованы')
+            return redirect(url_for('login_page'))
+
+    @app.route("/add_new_apt", methods=['GET', 'POST'])
+    def add_new_apt():
+        city_select = db_session.query(City).all()
+        area_select = db_session.query(Area).all()
+        room_count_select = db_session.query(RoomCount).all()
+        title = 'Создать страницу квартиры'
+        apartments = db_session.query(Apartment)
+        form = ApartmentForm()
+        if current_user.is_authenticated:
+            return render_template("add_new_apt.html", form=form, title=title,
+                                   apartments=apartments, city_select=city_select, area_select=area_select,
+                                   room_count_select=room_count_select)
+        else:
+            flash('Вы неавторизованы')
+            return redirect(url_for('login_page'))
+
+    @app.route("/create_apt", methods=['POST'])
+    def create_apt():
+        form = ApartmentForm()
+        selected_city_id = db_session.query(City).filter(City.name == request.form.get('city')).first()
+        selected_area_id = db_session.query(Area).filter(Area.name == request.form.get('area')).first()
+        selected_rooms_id = db_session.query(RoomCount).filter(RoomCount.name == request.form.get('room')).first()
+        apartment_address = form.address.data + ", дом " + str(form.apt.data) + ", квартира " + str(form.bld.data)
+        for address in db_session.query(Apartment).all():
+            if (apartment_address == address.address
+                    and selected_area_id.id == address.area_id
+                    and selected_city_id.id == address.city_id
+                    and selected_rooms_id.id == address.rooms_id):
+                flash("Такая квартира уже существует")
+                return redirect(url_for('main_page'))
+        if current_user.is_authenticated:
+            new_apt = Apartment(owner_name=form.owner_name.data,
+                                address=apartment_address,
+                                price=form.price.data,
+                                website=form.url.data,
+                                photos=form.photo.data,
+                                city_id=selected_city_id.id,
+                                area_id=selected_area_id.id,
+                                rooms_id=selected_rooms_id.id
+                                )
+            db_session.add(new_apt)
+            db_session.commit()
+            flash("Ваша квартира добавлена")
+            return redirect(url_for('main_page'))
         else:
             flash('Вы неавторизованы')
             return redirect(url_for('login_page'))

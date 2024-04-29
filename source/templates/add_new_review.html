@@ -5,7 +5,7 @@
     {% block content %}
     <div class="container-fluid h-100">
         <div class="row h-100 justify-content-center align-items-center">
-            <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('create_feedback') }}" method='post'>
+            <form class="col-10 col-sm-8 col-md-6 col-lg-4" action="{{ url_for('create_apt') }}" method='post'>
                 <div class="form-group">
                     <h1>{{ title }}</h1>
                       <div class="col-md">
@@ -18,6 +18,11 @@
                           <label for="aptSelect">Адрес</label>
                         </div>
                       </div>
+                    <p class="fs-6 text-body-secondary">
+                        <a href="/add_new_apt"  class="text-reset text-decoration-none">
+                            <em>Не нашли нужную квартиру</em><br/>
+                        </a>
+                    </p>
                     <p>
                         {{ form.raiting.label }}
                         {{ form.raiting() }}
