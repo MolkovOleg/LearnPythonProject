@@ -29,7 +29,8 @@ def create_app():
         city_select = db_session.query(City).all()
         area_select = db_session.query(Area).all()
         room_count_select = db_session.query(RoomCount).all()
-        apartments = (db_session.query(Apartment.address, Apartment.photos,
+        apartments = (db_session.query(Apartment.address,
+                                       Apartment.photos,
                                        func.avg(Feedback.raiting)
                       .label("avg_rating"))
                       .join(Feedback)
