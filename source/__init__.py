@@ -3,9 +3,12 @@ import datetime
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user
 
-from source.db.models import Apartment, Area, City, Feedback, RoomCount, User, FeedbackUser
+from source.db.models import (Apartment, Area, City, Feedback, RoomCount,
+                              User, FeedbackUser)
 from source.db.db import db_session
-from source.forms import LoginForm, RegistrationForm, FeedbackForm, ApartmentForm
+from source.forms import (LoginForm, RegistrationForm,
+                          FeedbackForm, ApartmentForm)
+from sqlalchemy import func
 
 
 def create_app():
@@ -26,25 +29,17 @@ def create_app():
         city_select = db_session.query(City).all()
         area_select = db_session.query(Area).all()
         room_count_select = db_session.query(RoomCount).all()
-        apartments = db_session.query(Apartment).all()
-        # feedbacks = db_session.query(Feedback).all()
-        #
-        # names = dict()
-        #
-        # for feedback in feedbacks:
-        #     if feedback['apartment_id'] not in names.keys():
-        #         names[feedback['apartment_id']] = 1
-        #     else:
-        #         names[feedback['apartment_id']] += 1
-        #
-        # for name, count in names.items():
-        #     print(f'{name}: {count}')
+        apartments = (db_session.query(Apartment.address, Apartment.photos,
+                                       func.avg(Feedback.raiting)
+                      .label("avg_rating"))
+                      .join(Feedback)
+                      .group_by(Apartment.id).all())
 
         return render_template("index.html",
                                apartments=apartments,
                                city_select=city_select,
                                area_select=area_select,
-                               room_count_select=room_count_select
+                               room_count_select=room_count_select,
                                )
 
     @app.route('/filter', methods=['GET'])
@@ -56,7 +51,11 @@ def create_app():
         selected_area = request.args.get('area', '')
         selected_rooms = request.args.get('room', '')
 
-        apartments = (db_session.query(Apartment).join(City).join(Area).join(RoomCount))
+        apartments = (db_session.query(Apartment)
+                      .join(City)
+                      .join(Area)
+                      .join(RoomCount)
+                      )
 
         if selected_city:
             apartments = apartments.filter(City.name == selected_city)
@@ -85,13 +84,12 @@ def create_app():
     def process_reg():
         form = RegistrationForm()
         if form.validate_on_submit():
-            new_user = User(
-                email=form.email.data,
-                first_name=form.first_name.data,
-                last_name=form.last_name.data,
-                password=form.password1.data,
-                phone=form.phone.data
-            )
+            new_user = User(email=form.email.data,
+                            first_name=form.first_name.data,
+                            last_name=form.last_name.data,
+                            password=form.password1.data,
+                            phone=form.phone.data
+                            )
             new_user.set_password(form.password1.data)
             db_session.add(new_user)
             db_session.commit()
@@ -100,7 +98,9 @@ def create_app():
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash('Ошибка в поле "{}": - {}'.format(getattr(form, field).label.text, error))
+                    flash('Ошибка в поле "{}": - {}'
+                          .format(getattr(form, field)
+                                  .label.text, error))
         return redirect(url_for('register'))
 
     @app.route("/login")
@@ -138,7 +138,11 @@ def create_app():
         apartments = db_session.query(Apartment)
         form = FeedbackForm()
         if current_user.is_authenticated:
-            return render_template("add_new_review.html", form=form, title=title, apartments=apartments)
+            return render_template("add_new_review.html",
+                                   form=form,
+                                   title=title,
+                                   apartments=apartments
+                                   )
         else:
             flash('Вы неавторизованы')
             return redirect(url_for('login_page'))
@@ -146,7 +150,9 @@ def create_app():
     @app.route("/create_feedback", methods=['POST'])
     def create_feedback():
         selected_apt = request.form.get('apt')
-        selected_apt_id = db_session.query(Apartment).filter(Apartment.address == selected_apt).first()
+        selected_apt_id = (db_session.query(Apartment)
+                           .filter(Apartment.address == selected_apt)
+                           .first())
         form = FeedbackForm()
         if current_user.is_authenticated:
             new_feedback = Feedback(apartment_id=selected_apt_id.id,
@@ -160,7 +166,8 @@ def create_app():
             db_session.commit()
             new_feedback_id = FeedbackUser(user_id=current_user.get_id(),
                                            feedback_id=new_feedback.id,
-                                           publication_date=datetime.datetime.now()
+                                           publication_date=datetime.
+                                           datetime.now()
                                            )
             db_session.add(new_feedback_id)
             db_session.commit()
@@ -179,15 +186,24 @@ def create_app():
         title = "Профиль"
         personal_info = "Личная информация"
         reviews = "Ваши отзывы"
-        user_info = db_session.query(User).filter(User.id == current_user.get_id())
+        user_info = (db_session.query(User)
+                     .filter(User.id == current_user
+                             .get_id()))
         if current_user.is_authenticated:
             user_feedback = ((db_session.query(Feedback)
-                             .join(FeedbackUser, Feedback.id == FeedbackUser.feedback_id)
-                             .join(Apartment, Apartment.id == Feedback.apartment_id)
-                             .filter(FeedbackUser.feedback_id == Feedback.id))
+                             .join(FeedbackUser, Feedback.id ==
+                                   FeedbackUser.feedback_id)
+                             .join(Apartment, Apartment.id ==
+                                   Feedback.apartment_id)
+                             .filter(FeedbackUser.feedback_id ==
+                                     Feedback.id))
                              .all())
-            return render_template("profile.html", user_feedback=user_feedback, title=title,
-                                   reviews=reviews, user_info=user_info, personal_info=personal_info)
+            return render_template("profile.html",
+                                   user_feedback=user_feedback,
+                                   title=title,
+                                   reviews=reviews,
+                                   user_info=user_info,
+                                   personal_info=personal_info)
         else:
             flash('Вы неавторизованы')
             return redirect(url_for('login_page'))
@@ -201,8 +217,12 @@ def create_app():
         apartments = db_session.query(Apartment)
         form = ApartmentForm()
         if current_user.is_authenticated:
-            return render_template("add_new_apt.html", form=form, title=title,
-                                   apartments=apartments, city_select=city_select, area_select=area_select,
+            return render_template("add_new_apt.html",
+                                   form=form,
+                                   title=title,
+                                   apartments=apartments,
+                                   city_select=city_select,
+                                   area_select=area_select,
                                    room_count_select=room_count_select)
         else:
             flash('Вы неавторизованы')
@@ -211,10 +231,21 @@ def create_app():
     @app.route("/create_apt", methods=['POST'])
     def create_apt():
         form = ApartmentForm()
-        selected_city_id = db_session.query(City).filter(City.name == request.form.get('city')).first()
-        selected_area_id = db_session.query(Area).filter(Area.name == request.form.get('area')).first()
-        selected_rooms_id = db_session.query(RoomCount).filter(RoomCount.name == request.form.get('room')).first()
-        apartment_address = form.address.data + ", дом " + str(form.apt.data) + ", квартира " + str(form.bld.data)
+        selected_city_id = (db_session.query(City)
+                            .filter(City.name ==
+                                    request.form.get('city'))
+                            .first())
+        selected_area_id = (db_session.query(Area)
+                            .filter(Area.name ==
+                                    request.form.get('area'))
+                            .first())
+        selected_rooms_id = (db_session.query(RoomCount)
+                             .filter(RoomCount.name ==
+                                     request.form.get('room'))
+                             .first())
+        apartment_address = (form.address.data + ", дом "
+                             + str(form.apt.data) + ", квартира "
+                             + str(form.bld.data))
         for address in db_session.query(Apartment).all():
             if (apartment_address == address.address
                     and selected_area_id.id == address.area_id

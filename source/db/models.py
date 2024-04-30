@@ -81,7 +81,8 @@ class Feedback(Base):
     __tablename__ = 'feedbacks'
 
     id = Column(Integer, primary_key=True)
-    apartment_id = Column(Integer, ForeignKey(Apartment.id), index=True, nullable=False)
+    apartment_id = Column(Integer, ForeignKey(Apartment.id),
+                          index=True, nullable=False)
     raiting = Column(Integer)
     price = Column(Integer)
     owner_name = Column(String)
@@ -100,7 +101,8 @@ class FeedbackUser(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id), index=True, nullable=False)
-    feedback_id = Column(Integer, ForeignKey(Feedback.id), index=True, nullable=False)
+    feedback_id = Column(Integer, ForeignKey(Feedback.id),
+                         index=True, nullable=False)
     publication_date = Column(Date)
 
     users = relationship('User', lazy='joined')
