@@ -14,7 +14,7 @@
       {% endif %}
     {% endwith %}
 
-    <form action="/filter" method="get">
+    <form action="/filter" method="GET">
         <div class="w-50 p-3">
           <div class="row">
             <div class="col-md">
@@ -71,11 +71,15 @@
           {% for apt in apartments %}
             <div class="col-4">
               <div class="p-3">
-                <img src= "{{ url_for('static', filename=apt.photos)}}" class="img-fluid uniform-image-size" alt="..."><br/>
-                <a href="/apt_review_page">
-                  {{apt.address}}<br/>
+                <a href="/apt_review_page?id={{ apt.id }}">
+                  <img src= "{{ url_for('static', filename=apt.photos)}}" class="img-fluid uniform-image-size" alt="..."><br/>
                 </a>
+                {{apt.address}}<br>
+                {% if apt.avg_rating %}
                   Средний рейтинг: {{apt.avg_rating | round(1)}}
+                {% else %}
+                  Средний рейтинг: Нет рейтинга
+                {% endif %}
               </div>
             </div>
           {% endfor %}
