@@ -31,9 +31,10 @@ def create_app():
         room_count_select = db_session.query(RoomCount).all()
         apartments = (db_session.query(Apartment.address,
                                        Apartment.photos,
+                                       Apartment.id,
                                        func.avg(Feedback.raiting)
                       .label("avg_rating"))
-                      .join(Feedback)
+                      .outerjoin(Feedback)
                       .group_by(Apartment.id).all())
 
         return render_template("index.html",
@@ -172,6 +173,7 @@ def create_app():
                                            )
             db_session.add(new_feedback_id)
             db_session.commit()
+            flash('Ваш отзыв успешно добавлен')
             return redirect(url_for('main_page'))
         else:
             flash('Вы неавторизованы')
@@ -179,8 +181,17 @@ def create_app():
 
     @app.route("/apt_review_page", methods=['GET'])
     def review_page():
-        apartments = db_session.query(Apartment).all()
-        return render_template("apt_review_page.html", apartments=apartments)
+        title = "Отызывы о квартире"
+        id = request.args.get('id', '')
+        apartments = (db_session.query(Apartment)
+                      .join(City)
+                      .join(Area)
+                      .join(RoomCount)
+                      .filter(Apartment.id == id)).all()
+        feedbacks = (db_session.query(Feedback)
+                     .filter(Feedback.apartment_id == id)).all()
+
+        return render_template("apt_review_page.html", apartments=apartments, title=title, feedbacks=feedbacks)
 
     @app.route("/profile")
     def profile():
